@@ -1,0 +1,8 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "ConnectionStrings:OrderProcessorProducer": "Data Source=C-SP8\\SQLEXPRESS; Initial Catalog=OrderProcessorProducer; Trusted_Connection=true;Trust Server Certificate=true"
+  }
+}

@@ -1,19 +1,17 @@
+using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using OrderProcessor.Producer.Entities;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = FunctionsApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.ConfigureFunctionsWebApplication();
 
 builder.Services.AddDbContext<OrderProcessorProducerDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("OrderProcessorProducer")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OrderProcessorProducer"));
+});
 
-var app = builder.Build();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+builder.Build().Run();
