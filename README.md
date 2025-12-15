@@ -55,8 +55,11 @@ The **Order Processor**
 # Usage
 Use GitHub Copilot to ask it whatever you'd like about orders and order creation! Some example prompts:
 > Create an order for me
+
 > What products are available to include in an order?
+
 > What shipping companies in Pennsylvania can I use to transport the order?
+
 > Send the order to [receiving address] from [sending address]
 
 # Contributing
