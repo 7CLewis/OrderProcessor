@@ -3,7 +3,7 @@
 public record OrderEvent(
     Guid EventId,
     DateTime EventTimestamp,
-    OrderEventType EventType,
+    string OrderEventType,
     string Version,
     int OrderId,
     DateTime CreatedUtc,

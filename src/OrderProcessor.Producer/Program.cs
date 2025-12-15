@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OrderProcessor.Producer;
 using OrderProcessor.Producer.Entities;
+using OrderProcessor.Producer.Events;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -23,6 +24,6 @@ builder.Services.AddSingleton(sp =>
     return new EventHubProducerClient(cs, "orders");
 });
 
-builder.Services.AddScoped<FuncOrders>();
+builder.Services.AddScoped<IEventPublisher<Order>, FuncOrders>();
 
 builder.Build().Run();

@@ -2,6 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Extensions.Mcp;
 using Microsoft.EntityFrameworkCore;
 using OrderProcessor.Producer.Entities;
+using OrderProcessor.Producer.Entities.Dtos;
 using OrderProcessor.Producer.Events;
 using static OrderProcessor.Producer.OrdersMCPToolInfo;
 
@@ -16,12 +17,12 @@ public class FuncOrdersMCP(
     private readonly IEventPublisher<Order> eventPublisher = eventPublisher;
 
     [Function(nameof(CreateOrder))]
-    public async Task<string> CreateOrder(
-        [McpToolTrigger(CreateOrderToolName, CreateOrderToolDescription)]
+    public async Task<McpResponse<int>> CreateOrder(
+        [McpToolTrigger(CreateOrderToolName, CreateOrderToolDescription)] 
             ToolInvocationContext _,
-        [McpToolProperty(ProductNamesPropertyName, ProductNamesPropertyDescription, true)]
+        [McpToolProperty(ProductNamesPropertyName, ProductNamesPropertyDescription, true)] 
             IEnumerable<string> productNames,
-        [McpToolProperty(SenderAddressLine1PropertyName, SenderAddressLine1PropertyDescription, true)]
+        [McpToolProperty(SenderAddressLine1PropertyName, SenderAddressLine1PropertyDescription, true)] 
             string senderAddressLine1,
         [McpToolProperty(SenderAddressLine2PropertyName, SenderAddressLine2PropertyDescription, false)]
             string senderAddressLine2,
@@ -36,7 +37,7 @@ public class FuncOrdersMCP(
         [McpToolProperty(ReceiverAddressLine1PropertyName, ReceiverAddressLine1PropertyDescription, true)]
             string receiverAddressLine1,
         [McpToolProperty(ReceiverAddressLine2PropertyName, ReceiverAddressLine2PropertyDescription, false)]
-        string receiverAddressLine2,
+            string receiverAddressLine2,
         [McpToolProperty(ReceiverAddressCityPropertyName, ReceiverAddressCityPropertyDescription, true)]
             string receiverAddressCity,
         [McpToolProperty(ReceiverAddressStatePropertyName, ReceiverAddressStatePropertyDescription, true)]
@@ -54,7 +55,14 @@ public class FuncOrdersMCP(
 
         if (transportCompany == null)
         {
-            return $"Transport Company '{transportCompanyName}' not found.";
+            return new McpResponse<int>()
+            {
+                Success = false,
+                Error = new McpError(
+                    "TransportCompanyNotFound",
+                    $"Transport Company '{transportCompanyName}' not found."
+                )
+            };
         }
 
         var products = await dbContext.Products
@@ -63,7 +71,15 @@ public class FuncOrdersMCP(
 
         if (products.Count != productNames.Count())
         {
-            return $"Some products not found: {string.Join(", ", productNames.Except(products.Select(p => p.Name))) }";
+            var missingProducts = string.Join(", ", productNames.Except(products.Select(p => p.Name)));
+            return new McpResponse<int>()
+            {
+                Success = false,
+                Error = new McpError(
+                    "SomeProductsNotFound",
+                    $"One or more products were not found in the database: {missingProducts}"
+                )
+            };
         }
 
         var order = new Order(
@@ -73,7 +89,7 @@ public class FuncOrdersMCP(
                 senderAddressCity,
                 senderAddressState,
                 senderAddressPostalCode,
-                senderAddressCountry    
+                senderAddressCountry
             ),
             new Address(
                 receiverAddressLine1,
@@ -94,7 +110,15 @@ public class FuncOrdersMCP(
         }
         catch(Exception ex)
         {
-            return $"Failed to create order due to a database error: {ex.Message}";
+            return new McpResponse<int>()
+            {
+                Success = false,
+                Error = new McpError(
+                    "DatabaseError",
+                    "Failed to create order in the database.",
+                    ex.Message
+                )
+            };
         }
 
         try
@@ -102,15 +126,28 @@ public class FuncOrdersMCP(
             // Create order event
             await eventPublisher.PublishOrderCreatedAsync(order);
         }
-        catch(Exception ex) {
-            return $"Order created but failed to publish order created event: {ex.Message}";
+        catch(Exception ex)
+        {
+            return new McpResponse<int>()
+            {
+                Success = false,
+                Error = new McpError(
+                    "EventPublishingError",
+                    "Order created but failed to publish order created event.",
+                    ex.Message
+                )
+            };
         }
 
-        return "Order Created Successfully";
+        return new McpResponse<int>()
+        {
+            Success = true,
+            Data = order.Id
+        };
     }
 
     [Function(nameof(GetProducts))]
-    public async Task<IEnumerable<Product>> GetProducts(
+    public async Task<IEnumerable<ProductDto>> GetProducts(
         [McpToolTrigger(GetProductsToolName, GetProductsToolDescription)]
             ToolInvocationContext _,
         [McpToolProperty(ProductNameFilterPropertyName, ProductNameFilterPropertyDescription, false)]
@@ -119,12 +156,20 @@ public class FuncOrdersMCP(
     {
         var products = await dbContext.Products
             .Where(p => string.IsNullOrEmpty(productNameFilter) || p.Name.Contains(productNameFilter))
+            .Select(p => new ProductDto
+            {
+                Name = p.Name,
+                Description = p.Description,
+                UnitOfMeasure = p.UnitOfMeasure,
+                Quantity = p.Quantity,
+                PricePerUnit = p.PricePerUnit
+            })
             .ToListAsync();
         return products;
     }
 
     [Function(nameof(GetTransportCompanies))]
-    public async Task<IEnumerable<TransportCompany>> GetTransportCompanies(
+    public async Task<IEnumerable<TransportCompanyDto>> GetTransportCompanies(
         [McpToolTrigger(GetTransportCompaniesToolName, GetTransportCompaniesToolDescription)]
             ToolInvocationContext _,
         [McpToolProperty(TransportCompanyNameFilterPropertyName, TransportCompanyNameFilterPropertyDescription, false)]
@@ -133,6 +178,20 @@ public class FuncOrdersMCP(
     {
         var transportCompanies = await dbContext.TransportCompanies
             .Where(tc => string.IsNullOrEmpty(transportCompanyFilter) || tc.Name.Contains(transportCompanyFilter))
+            .Select(tc => new TransportCompanyDto
+            {
+                Name = tc.Name,
+                ContactPhone = tc.ContactPhone,
+                HeadquartersAddress = new AddressDto
+                {
+                    Line1 = tc.HeadquartersAddress.Line1,
+                    Line2 = tc.HeadquartersAddress.Line2,
+                    City = tc.HeadquartersAddress.City,
+                    StateOrProvince = tc.HeadquartersAddress.StateOrProvince,
+                    PostalCode = tc.HeadquartersAddress.PostalCode,
+                    Country = tc.HeadquartersAddress.Country
+                }
+            })
             .ToListAsync();
         return transportCompanies;
     }

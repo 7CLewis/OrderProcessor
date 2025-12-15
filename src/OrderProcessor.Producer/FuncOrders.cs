@@ -17,10 +17,10 @@ public class FuncOrders : IEventPublisher<Order>
 
     public async Task PublishOrderCreatedAsync(Order order, CancellationToken ct = default)
     {
-        var cloudEvent = new OrderEvent(
+        var orderEvent = new OrderEvent(
             Guid.NewGuid(),
             DateTime.UtcNow,
-            OrderEventType.Created,
+            OrderEventType.Created.ToString(),
             "1.0",
             order.Id,
             order.CreatedUtc,
@@ -60,7 +60,7 @@ public class FuncOrders : IEventPublisher<Order>
             )
         );
 
-        var json = JsonSerializer.Serialize(cloudEvent);
+        var json = JsonSerializer.Serialize(orderEvent);
 
         using var batch = await _producer.CreateBatchAsync(ct);
         batch.TryAdd(new EventData(json));

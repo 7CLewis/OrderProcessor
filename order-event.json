@@ -1,0 +1,50 @@
+{
+  "EventId": "d787184a-3998-4f1b-9073-7a7c5a82e41f",
+  "EventTimestamp": "2025-12-15T20:49:52.222722Z",
+  "OrderEventType": "Created",
+  "Version": "1.0",
+  "OrderId": 9,
+  "CreatedUtc": "2025-12-15T20:49:51.4597342Z",
+  "SenderAddress": {
+    "Line1": "777 W Main St",
+    "Line2": null,
+    "City": "Scranton",
+    "StateOrProvince": "PA",
+    "PostalCode": "23583",
+    "Country": "USA"
+  },
+  "ReceiverAddress": {
+    "Line1": "123 Star Rd",
+    "Line2": "Apt. 121",
+    "City": "Tulsa",
+    "StateOrProvince": "OK",
+    "PostalCode": "21343",
+    "Country": "USA"
+  },
+  "Products": [
+    {
+      "Name": "Colored Copy Paper",
+      "Description": "Assorted-color copy paper for flyers, notices, and office communication.",
+      "PricePerUnit": "11.99",
+      "Quantity": 1
+    },
+    {
+      "Name": "Sticky Notes (3x3)",
+      "Description": "Yellow sticky notes for reminders and quick notes.",
+      "PricePerUnit": "14.99",
+      "Quantity": 12
+    }
+  ],
+  "TransportCompany": {
+    "Name": "Northeast Regional Shipping",
+    "ContactPhone": "201-555-3300",
+    "HeadquartersAddress": {
+      "Line1": "88 Industrial Way",
+      "Line2": null,
+      "City": "Newark",
+      "StateOrProvince": "NJ",
+      "PostalCode": "07102",
+      "Country": "USA"
+    }
+  }
+}
