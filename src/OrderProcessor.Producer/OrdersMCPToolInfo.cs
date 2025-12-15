@@ -1,5 +1,5 @@
 ﻿namespace OrderProcessor.Producer;
-internal sealed class OrderMCPToolInfo
+internal sealed class OrdersMCPToolInfo
 {
     // Create Order
     public const string CreateOrderToolName = "create_order";

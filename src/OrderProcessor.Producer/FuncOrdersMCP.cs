@@ -2,11 +2,11 @@
 using Microsoft.Azure.Functions.Worker.Extensions.Mcp;
 using Microsoft.EntityFrameworkCore;
 using OrderProcessor.Producer.Entities;
-using static OrderProcessor.Producer.OrderMCPToolInfo;
+using static OrderProcessor.Producer.OrdersMCPToolInfo;
 
 namespace OrderProcessor.Producer;
 
-public class OrderMCP(OrderProcessorProducerDbContext dbContext)
+public class FuncOrdersMCP(OrderProcessorProducerDbContext dbContext)
 {
     private readonly OrderProcessorProducerDbContext dbContext = dbContext;
 
@@ -86,6 +86,8 @@ public class OrderMCP(OrderProcessorProducerDbContext dbContext)
         {
             dbContext.Orders.Add(order);
             await dbContext.SaveChangesAsync();
+            
+            // Create order event
         }
         catch(Exception ex)
         {
