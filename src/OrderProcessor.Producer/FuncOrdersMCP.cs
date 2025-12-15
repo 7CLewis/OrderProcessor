@@ -2,13 +2,18 @@
 using Microsoft.Azure.Functions.Worker.Extensions.Mcp;
 using Microsoft.EntityFrameworkCore;
 using OrderProcessor.Producer.Entities;
+using OrderProcessor.Producer.Events;
 using static OrderProcessor.Producer.OrdersMCPToolInfo;
 
 namespace OrderProcessor.Producer;
 
-public class FuncOrdersMCP(OrderProcessorProducerDbContext dbContext)
+public class FuncOrdersMCP(
+    OrderProcessorProducerDbContext dbContext,
+    IEventPublisher<Order> eventPublisher
+)
 {
     private readonly OrderProcessorProducerDbContext dbContext = dbContext;
+    private readonly IEventPublisher<Order> eventPublisher = eventPublisher;
 
     [Function(nameof(CreateOrder))]
     public async Task<string> CreateOrder(
@@ -86,12 +91,19 @@ public class FuncOrdersMCP(OrderProcessorProducerDbContext dbContext)
         {
             dbContext.Orders.Add(order);
             await dbContext.SaveChangesAsync();
-            
-            // Create order event
         }
         catch(Exception ex)
         {
             return $"Failed to create order due to a database error: {ex.Message}";
+        }
+
+        try
+        {
+            // Create order event
+            await eventPublisher.PublishOrderCreatedAsync(order);
+        }
+        catch(Exception ex) {
+            return $"Order created but failed to publish order created event: {ex.Message}";
         }
 
         return "Order Created Successfully";

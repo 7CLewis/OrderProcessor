@@ -5,7 +5,7 @@ public record OrderEvent(
     DateTime EventTimestamp,
     OrderEventType EventType,
     string Version,
-    Guid OrderId,
+    int OrderId,
     DateTime CreatedUtc,
     AddressEmbedded SenderAddress,
     AddressEmbedded ReceiverAddress,

@@ -3,6 +3,6 @@
 public record ProductEmbedded(
     string Name,
     string Description,
-    decimal Price,
+    string PricePerUnit,
     int Quantity
 );
