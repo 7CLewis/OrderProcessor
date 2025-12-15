@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "EventHubConnection": "Endpoint=sb://orderprocessor-producer.servicebus.windows.net/;SharedAccessKeyName=Send;SharedAccessKey=XXXXXXXXXXXXXXXXXXXXXXXX",
+    "ConnectionStrings:OrderProcessorProducer": "Data Source=C-SP8\\SQLEXPRESS; Initial Catalog=OrderProcessorProducer; Trusted_Connection=true;Trust Server Certificate=true"
+  }
+}
