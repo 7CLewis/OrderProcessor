@@ -17,8 +17,10 @@ public class FuncOrders : IEventPublisher<Order>
 
     public async Task PublishOrderCreatedAsync(Order order, CancellationToken ct = default)
     {
+        var eventId = Guid.NewGuid();
+
         var orderEvent = new OrderEvent(
-            Guid.NewGuid(),
+            eventId,
             DateTime.UtcNow,
             OrderEventType.Created.ToString(),
             "1.0",
@@ -62,8 +64,12 @@ public class FuncOrders : IEventPublisher<Order>
 
         var json = JsonSerializer.Serialize(orderEvent);
 
+        var eventData = new EventData(json);
+        eventData.Properties["OrderEventType"] = OrderEventType.Created.ToString();
+        eventData.Properties["OrderId"] = order.Id;
+
         using var batch = await _producer.CreateBatchAsync(ct);
-        batch.TryAdd(new EventData(json));
+        batch.TryAdd(eventData);
 
         await _producer.SendAsync(batch, ct);
     }
