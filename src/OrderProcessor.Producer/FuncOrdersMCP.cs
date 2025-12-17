@@ -83,6 +83,7 @@ public class FuncOrdersMCP(
         }
 
         var order = new Order(
+            OrderStatus.Created,
             new Address(
                 senderAddressLine1,
                 senderAddressLine2,
@@ -194,5 +195,68 @@ public class FuncOrdersMCP(
             })
             .ToListAsync();
         return transportCompanies;
+    }
+
+    [Function(nameof(GetOrderInfo))]
+    public async Task<IEnumerable<OrderDto>> GetOrderInfo(
+        [McpToolTrigger(GetOrderInfoToolName, GetOrderInfoToolDescription)]
+            ToolInvocationContext _,
+        [McpToolProperty(OrderIdFilterPropertyName, OrderIdFilterPropertyDescription, false)]
+            string? orderIdFilter,
+        [McpToolProperty(OrderStatusFilterPropertyName, OrderStatusFilterPropertyDescription, false)]
+            string? orderStatusFilter
+    )
+    {
+        var orders = await dbContext.Orders
+            .Where(o => (string.IsNullOrEmpty(orderIdFilter) || o.Id.ToString().Contains(orderIdFilter)) &&
+                         (string.IsNullOrEmpty(orderStatusFilter) || o.OrderStatus.Contains(orderStatusFilter))
+            )
+            .Select(o => new OrderDto
+            {
+                Id = o.Id,
+                OrderStatus = o.OrderStatus,
+                Products = o.Products.Select(p => new ProductDto
+                {
+                    Name = p.Name,
+                    Description = p.Description,
+                    UnitOfMeasure = p.UnitOfMeasure,
+                    Quantity = p.Quantity,
+                    PricePerUnit = p.PricePerUnit
+                }).ToList(),
+                SenderAddress = new AddressDto
+                {
+                    Line1 = o.SenderAddress.Line1,
+                    Line2 = o.SenderAddress.Line2,
+                    City = o.SenderAddress.City,
+                    StateOrProvince = o.SenderAddress.StateOrProvince,
+                    PostalCode = o.SenderAddress.PostalCode,
+                    Country = o.SenderAddress.Country
+                },
+                ReceiverAddress = new AddressDto
+                {
+                    Line1 = o.ReceiverAddress.Line1,
+                    Line2 = o.ReceiverAddress.Line2,
+                    City = o.ReceiverAddress.City,
+                    StateOrProvince = o.ReceiverAddress.StateOrProvince,
+                    PostalCode = o.ReceiverAddress.PostalCode,
+                    Country = o.ReceiverAddress.Country
+                },
+                TransportCompany = new TransportCompanyDto
+                {
+                    Name = o.TransportCompany.Name,
+                    ContactPhone = o.TransportCompany.ContactPhone,
+                    HeadquartersAddress = new AddressDto
+                    {
+                        Line1 = o.TransportCompany.HeadquartersAddress.Line1,
+                        Line2 = o.TransportCompany.HeadquartersAddress.Line2,
+                        City = o.TransportCompany.HeadquartersAddress.City,
+                        StateOrProvince = o.TransportCompany.HeadquartersAddress.StateOrProvince,
+                        PostalCode = o.TransportCompany.HeadquartersAddress.PostalCode,
+                        Country = o.TransportCompany.HeadquartersAddress.Country
+                    }
+                },
+            })
+            .ToListAsync();
+        return orders;
     }
 }

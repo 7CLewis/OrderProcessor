@@ -32,8 +32,6 @@ internal sealed class OrdersMCPToolInfo
     public const string ReceiverAddressCountryPropertyDescription = "Receiver's address country";
     public const string TransportCompanyNamePropertyName = "transport_company_name";
     public const string TransportCompanyNamePropertyDescription = "Name of the transport company to use for the order";
-    public const string GetOrderInfoToolName = "get_order_info";
-    public const string GetOrderInfoToolDescription = "Get requested information about an order(s)";
 
     // Get Products
     public const string GetProductsToolName = "get_products";
@@ -46,4 +44,12 @@ internal sealed class OrdersMCPToolInfo
     public const string GetTransportCompaniesToolDescription = "Get a list of transport companies";
     public const string TransportCompanyNameFilterPropertyName = "transport_company_name_filter";
     public const string TransportCompanyNameFilterPropertyDescription = "Substring to search for in transport company names";
+
+    // Get Order Info
+    public const string GetOrderInfoToolName = "get_order_info";
+    public const string GetOrderInfoToolDescription = "Get requested information about an order(s)";
+    public const string OrderIdFilterPropertyName = "order_id_filter";
+    public const string OrderIdFilterPropertyDescription = "Filter orders by ID";
+    public const string OrderStatusFilterPropertyName = "order_status_filter";
+    public const string OrderStatusFilterPropertyDescription = "Filter orders by status";
 }

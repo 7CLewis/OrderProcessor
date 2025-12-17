@@ -6,11 +6,13 @@ public class Order
     public Order() { }
 
     public Order(
+        OrderStatus orderStatus,
         Address senderAddress,
         Address receiverAddress,
         IEnumerable<Product> products,
         TransportCompany transportCompany)
     {
+        OrderStatus = orderStatus.ToString();
         SenderAddress = senderAddress;
         ReceiverAddress = receiverAddress;
         Products = products;
@@ -19,6 +21,7 @@ public class Order
 
     public int Id { get; set; }
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+    public string OrderStatus { get; set; }
     public Address SenderAddress { get; set; }
     public Address ReceiverAddress { get; set; }
     public IEnumerable<Product> Products { get; set; }
@@ -26,3 +29,11 @@ public class Order
     public int TransportCompanyId { get; set; }
 }
 
+public enum OrderStatus
+{
+    Created,
+    Processed,
+    Shipped,
+    Delivered,
+    Cancelled
+}

@@ -69,5 +69,14 @@ INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
 VALUES (N'20251213184753_Initial', N'10.0.1');
 
 COMMIT;
+
+BEGIN TRANSACTION;
+ALTER TABLE [Orders] ADD [OrderStatus] nvarchar(max) NOT NULL DEFAULT N'';
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20251217214738_OrderStatus', N'10.0.1');
+
+COMMIT;
+GO
 GO
 
