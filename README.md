@@ -43,7 +43,7 @@ The **Order Processor**
   - Account used for connection string needs `db_datareader` and `db_datawriter` permissions on the DB.
 - Open the `OrderProcessor` Solution in Visual Studio
 - Copy-paste the `eng/sql/seed-data.sql` into your `OrderProcessorProducer` DB. 
-- Copy-paste the `src/OrderProcessor/Migrations/Initial.sql` into your `OrderProcessorProducer` DB.
+- Copy-paste the `src/OrderProcessor/Migrations/CreateSchema.sql` into your `OrderProcessorProducer` DB.
 
 ### Producer MCP Server
 - Open the `OrderProcessor` Solution in Visual Studio
